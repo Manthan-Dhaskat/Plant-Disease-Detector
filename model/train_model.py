@@ -1,9 +1,17 @@
 import tensorflow as tf
 from keras import layers,models
 import matplotlib.pyplot as plt
+import json
+from tensorflow.keras.callbacks import EarlyStopping
 
 IMG_SIZE = 224
 BATCH_SIZE = 32
+
+early_stop = EarlyStopping(
+    monitor='val_loss',
+    patience=3,
+    restore_best_weights=True
+)
 
 train_dataset = tf.keras.utils.image_dataset_from_directory(
     'data',
@@ -23,6 +31,15 @@ val_dataset = tf.keras.utils.image_dataset_from_directory(
     batch_size=BATCH_SIZE,
 )
 
+class_name=train_dataset.class_names
+
+with open("class_name.json","w") as f:
+    json.dump(class_name,f)
+
+
+print("class_name saved")
+print(class_name)
+
 model = models.Sequential([
     
     layers.Rescaling(1./255,input_shape=(IMG_SIZE,IMG_SIZE,3)),
@@ -39,7 +56,7 @@ model = models.Sequential([
     layers.Flatten(),
     
     layers.Dense(128,activation='relu'),
-    layers.Dropout(0.5),
+    layers.Dropout(0.3),
     
     layers.Dense(15,activation = 'softmax')
 ])
@@ -50,12 +67,13 @@ model.compile(
     metrics = ['accuracy']
 )
 
-EPOCHS = 15
+EPOCHS = 30
 
 history = model.fit(
     train_dataset,
     validation_data = val_dataset,
-    epochs = EPOCHS
+    epochs = EPOCHS,
+    callbacks=[early_stop]
 )
 
 plt.plot(history.history['accuracy'], label='Training Accuracy')
