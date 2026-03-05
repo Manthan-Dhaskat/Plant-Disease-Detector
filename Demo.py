@@ -12,7 +12,7 @@ with open('class_name.json') as f:
     class_names = json.load(f)
 
 # Image path
-img_path = r"Testing\4.jpg"
+img_path = r"data\Tomato_Leaf_Mold\6ad9e92c-8dff-450a-b289-5408ee37c014___Crnl_L.Mold 6953.JPG"
 
 # Load image
 img = image.load_img(img_path, target_size=(224, 224))
